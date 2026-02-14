@@ -1,40 +1,39 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-} from "chart.js";
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function Dashboard() {
-  const [report, setReport] = useState([]);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/report/")
-      .then(res => setReport(res.data));
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      console.log("No token found");
+      return;
+    }
+
+    axios.get("http://127.0.0.1:8000/api/dashboard/", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setStats(res.data);
+    })
+    .catch(err => {
+      console.log("Dashboard error:", err.response?.data || err);
+    });
+
   }, []);
 
-  const data = {
-    labels: report.map(r => r.student),
-    datasets: [
-      {
-        label: "Attendance %",
-        data: report.map(r => r.attendance_percentage),
-      }
-    ]
-  };
+  if (!stats) return <p>Loading...</p>;
 
   return (
     <div>
-      <h2>Attendance Dashboard</h2>
-      <Bar data={data} />
+      <h2>Dashboard</h2>
+
+      <p>Total Students: {stats.total_students}</p>
+      <p>Total Records: {stats.total_records}</p>
+      <p>Overall %: {stats.overall_percentage}%</p>
+      <p>Low Attendance: {stats.low_attendance_count}</p>
     </div>
   );
 }

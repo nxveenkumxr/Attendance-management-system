@@ -1,8 +1,18 @@
 from django.urls import path
-from .views import StudentListCreateView, AttendanceCreateView, AttendanceReportView
+from .views import (
+    StudentListCreateView,
+    AttendanceListCreateView,
+    AttendanceUpdateDeleteView,
+    AttendanceReportView,
+    DepartmentListCreateView,
+    DashboardStatsView,
+)
 
 urlpatterns = [
-    path('students/', StudentListCreateView.as_view(), name='student-list'),
-    path('attendance/', AttendanceCreateView.as_view(), name='attendance-create'),
-    path('report/', AttendanceReportView.as_view(), name='attendance-report'),
+    path('students/', StudentListCreateView.as_view()),
+    path('attendance/', AttendanceListCreateView.as_view()),
+    path('attendance/<int:pk>/', AttendanceUpdateDeleteView.as_view()),
+    path('report/', AttendanceReportView.as_view()),
+    path('departments/', DepartmentListCreateView.as_view()),
+    path('dashboard/', DashboardStatsView.as_view()),
 ]
